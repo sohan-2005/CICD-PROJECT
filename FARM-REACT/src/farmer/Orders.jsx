@@ -1,56 +1,89 @@
-// src/farmer/Orders.jsx
-import { useEffect, useState } from 'react';  // ← ADD THIS
-import API from '../services/api';
-import { Table, Badge, Button } from 'react-bootstrap';
+// src/farmer/FarmerOrders.jsx
+import React, { useEffect, useState } from "react";
+import API from "../services/api";
+import theme from "../theme/ordersTheme";
 
 const FarmerOrders = () => {
   const [orders, setOrders] = useState([]);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    API.get(`/api/orders/farmer/${user.id}`).then(res => setOrders(res.data));
+    API.get(`/api/orders/farmer/${user.id}`).then((res) => setOrders(res.data));
   }, [user.id]);
 
-  const accept = (id) => {
+  const acceptOrder = (id) => {
     API.put(`/api/orders/${id}/accept`).then(() => {
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, status: 'ACCEPTED' } : o));
+      setOrders((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, status: "ACCEPTED" } : o))
+      );
     });
   };
 
+  const getBadgeStyle = (status) =>
+    status === "PENDING" ? theme.badge.warning : theme.badge.success;
+
   return (
-    <div>
-      <h3 className="text-success">My Orders</h3>
-      <Table striped bordered hover>
+    <main
+      style={{
+        ...theme.layout,
+        backgroundColor: theme.colors.background,
+        fontFamily: theme.typography.fontFamily,
+      }}
+    >
+      <h3 style={theme.typography.h3}>Customer Orders</h3>
+
+      <table style={theme.table.container}>
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th style={theme.table.th}>Product</th>
+            <th style={theme.table.th}>Qty</th>
+            <th style={theme.table.th}>Total</th>
+            <th style={theme.table.th}>Status</th>
+            <th style={theme.table.th}>Action</th>
           </tr>
         </thead>
+
         <tbody>
-          {orders.map(o => (
-            <tr key={o.id}>
-              <td>{o.productName}</td>
-              <td>{o.quantity}</td>
-              <td>₹{o.totalPrice}</td>
-              <td>
-                <Badge bg={o.status === 'PENDING' ? 'warning' : 'success'}>
+          {orders.map((o) => (
+            <tr
+              key={o.id}
+              style={theme.table.rowHover}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#f0fdf4")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              <td style={theme.table.td}>{o.productName}</td>
+              <td style={theme.table.td}>{o.quantity} kg</td>
+              <td style={theme.table.td}>₹{o.totalPrice}</td>
+
+              <td style={theme.table.td}>
+                <span style={{ ...theme.badge.base, ...getBadgeStyle(o.status) }}>
                   {o.status}
-                </Badge>
+                </span>
               </td>
-              <td>
-                {o.status === 'PENDING' && (
-                  <Button size="sm" onClick={() => accept(o.id)}>Accept</Button>
+
+              <td style={theme.table.td}>
+                {o.status === "PENDING" && (
+                  <button
+                    style={{
+                      padding: "7px 16px",
+                      fontSize: "0.85rem",
+                      borderRadius: "8px",
+                      background: theme.colors.primary,
+                      color: "#fff",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => acceptOrder(o.id)}
+                  >
+                    Accept
+                  </button>
                 )}
               </td>
             </tr>
           ))}
         </tbody>
-      </Table>
-    </div>
+      </table>
+    </main>
   );
 };
 

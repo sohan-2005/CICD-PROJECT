@@ -1,3 +1,2 @@
-2025/11/03-18:10:40.621 6dd4 Reusing MANIFEST E:\3-1(SDP)\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Session Storage/MANIFEST-000001
-2025/11/03-18:10:40.624 6dd4 Recovering log #3
-2025/11/03-18:10:40.628 6dd4 Reusing old log E:\3-1(SDP)\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Session Storage/000003.log 
+2025/11/27-18:13:23.909 f0c Creating DB E:\Farmer-Friendly\SDP-105\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Session Storage since it was missing.
+2025/11/27-18:13:23.919 f0c Reusing MANIFEST E:\Farmer-Friendly\SDP-105\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Session Storage/MANIFEST-000001

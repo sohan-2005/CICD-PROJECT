@@ -1,10 +1,97 @@
-// src/buyer/Home.jsx
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import API from '../services/api';
-import { Card, CardMedia, CardContent, Typography, Button, Grid, Chip, Box, Skeleton, IconButton } from '@mui/material';
-import { AddShoppingCart, Visibility } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+
+const theme = {
+  colors: {
+    primary: '#15803d',
+    primaryHover: '#166534',
+    primaryLight: '#dcfce7',
+    success: '#10b981',
+    gold: '#f59e0b',
+    goldHover: '#d97706',
+    textPrimary: '#111827',
+    textSecondary: '#6b7280',
+    background: '#f9fafb',
+    surface: '#ffffff',
+    border: '#d1d5db',
+    muted: '#f3f4f6',
+  },
+  typography: {
+    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+    h4: { fontSize: '1.875rem', fontWeight: 700, color: '#15803d', marginBottom: '0.5rem' },
+    h6: { fontSize: '1.125rem', fontWeight: 600, color: '#111827', marginBottom: '0.25rem' },
+    body2: { fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' },
+    price: { fontSize: '1.25rem', fontWeight: 700, color: '#15803d' },
+    caption: { fontSize: '0.75rem', color: '#9ca3af' },
+  },
+  layout: {
+    padding: '1.5rem 1rem',
+    maxWidth: '1200px',
+    margin: '0 auto',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '1.5rem',
+  },
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(21, 128, 61, 0.08)',
+    overflow: 'hidden',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    border: `1px solid ${theme.colors.border}`,
+  },
+  cardImage: {
+    width: '100%',
+    height: '180px',
+    objectFit: 'cover',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '2rem',
+    paddingBottom: '1rem',
+    borderBottom: `1px solid ${theme.colors.border}`,
+  },
+  chip: {
+    backgroundColor: theme.colors.primaryLight,
+    color: theme.colors.primary,
+    padding: '4px 12px',
+    borderRadius: '20px',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+  },
+  button: {
+    borderRadius: '10px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    padding: '12px 20px',
+    cursor: 'pointer',
+    border: 'none',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    whiteSpace: 'nowrap',
+  },
+  skeleton: {
+    backgroundColor: theme.colors.muted,
+    borderRadius: '12px',
+    height: '320px',
+  },
+  noResults: {
+    textAlign: 'center',
+    padding: '4rem 1rem',
+    color: theme.colors.textSecondary,
+  }
+};
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -39,91 +126,130 @@ const Home = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header with My Orders Link */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#0F1111' }}>
-          {search ? `Results for "${search}"` : 'Fresh from Farmers'}
-        </Typography>
-        <Button 
-          component={Link} 
-          to="/buyer/orders"
-          variant="outlined"
-          startIcon={<Visibility />}
-          sx={{ textTransform: 'none', fontWeight: 'bold' }}
-        >
-          My Orders
-        </Button>
-      </Box>
+    <div style={{ 
+      fontFamily: theme.typography.fontFamily, 
+      backgroundColor: theme.colors.background, 
+      minHeight: '100vh',
+      padding: theme.layout.padding 
+    }}>
+      <div style={{ maxWidth: theme.layout.maxWidth, margin: '0 auto' }}>
+        {/* Header */}
+        <div style={theme.header}>
+          <h4 style={theme.typography.h4}>
+            {search ? `Results for "${search}"` : 'Fresh from Farmers'}
+          </h4>
+          <Link 
+            to="/buyer/orders"
+            style={{
+              ...theme.button,
+              backgroundColor: 'transparent',
+              color: theme.colors.primary,
+              border: `2px solid ${theme.colors.primary}`,
+              padding: '10px 20px',
+              textDecoration: 'none',
+              fontWeight: 600,
+            }}
+          >
+            👁️ My Orders
+          </Link>
+        </div>
 
-      <Grid container spacing={3}>
-        {loading ? (
-          Array(6).fill().map((_, i) => (
-            <Grid item xs={6} sm={4} md={3} key={i}>
-              <Skeleton variant="rectangular" height={320} sx={{ borderRadius: 2 }} />
-            </Grid>
-          ))
-        ) : products.length === 0 ? (
-          <Grid item xs={12}>
-            <Typography align="center" color="text.secondary" sx={{ my: 8, fontSize: 18 }}>
-              No products found
-            </Typography>
-          </Grid>
-        ) : (
-          products.map(p => (
-            <Grid item xs={6} sm={4} md={3} key={p.id}>
-              <Card sx={{ 
-                height: '100%', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                boxShadow: 3, 
-                transition: '0.3s',
-                '&:hover': { boxShadow: 8, transform: 'translateY(-4px)' }
-              }}>
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={p.imageUrl || 'https://via.placeholder.com/300x180?text=No+Image'}
+        {/* Products Grid */}
+        <div style={theme.grid}>
+          {loading ? (
+            Array(6).fill().map((_, i) => (
+              <div key={i} style={theme.skeleton} />
+            ))
+          ) : products.length === 0 ? (
+            <div style={theme.noResults}>
+              <h5 style={{ color: theme.colors.textPrimary, marginBottom: '1rem' }}>
+                No products found
+              </h5>
+              <p style={{ fontSize: '1rem', opacity: 0.7 }}>
+                Try adjusting your search or check back later for fresh produce!
+              </p>
+            </div>
+          ) : (
+            products.map(p => (
+              <div 
+                key={p.id} 
+                style={theme.card}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-8px)';
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(21, 128, 61, 0.15)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(21, 128, 61, 0.08)';
+                }}
+              >
+                <img 
+                  src={p.imageUrl || 'https://via.placeholder.com/300x180?text=No+Image'} 
                   alt={p.name}
-                  sx={{ objectFit: 'cover', borderRadius: '8px 8px 0 0' }}
+                  style={theme.cardImage}
                 />
-                <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-                  <Typography variant="h6" noWrap sx={{ fontWeight: 600 }}>{p.name}</Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap sx={{ mb: 1 }}>
-                    {p.description || 'Fresh organic produce'}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <Chip label={p.category} size="small" color="success" />
-                    <Typography variant="caption" color="text.secondary">
+                <div style={{ 
+                  padding: '1.25rem', 
+                  flexGrow: 1, 
+                  display: 'flex', 
+                  flexDirection: 'column' 
+                }}>
+                  <h6 style={theme.typography.h6}>{p.name}</h6>
+                  <p style={{
+                    ...theme.typography.body2,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}>
+                    {p.description || 'Fresh organic produce from local farmers'}
+                  </p>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.75rem', 
+                    marginBottom: '1rem' 
+                  }}>
+                    <span style={theme.chip}>
+                      {p.category || 'Organic'}
+                    </span>
+                    <span style={theme.typography.caption}>
                       {p.quantity} kg available
-                    </Typography>
-                  </Box>
-                  <Typography variant="h5" color="success.main" sx={{ fontWeight: 'bold' }}>
+                    </span>
+                  </div>
+                  <div style={theme.typography.price}>
                     ₹{p.pricePerKg}/kg
-                  </Typography>
-                </CardContent>
-                <Box sx={{ p: 2, pt: 0 }}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<AddShoppingCart />}
+                  </div>
+                </div>
+                <div style={{ padding: '0 1.25rem 1.25rem' }}>
+                  <button
                     onClick={() => addToCart(p)}
-                    sx={{ 
-                      bgcolor: '#febd69', 
-                      color: '#0F1111', 
-                      fontWeight: 'bold',
-                      '&:hover': { bgcolor: '#f3a847' } 
+                    style={{
+                      ...theme.button,
+                      width: '100%',
+                      backgroundColor: theme.colors.gold,
+                      color: theme.colors.textPrimary,
+                      fontWeight: 700,
+                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.backgroundColor = theme.colors.goldHover;
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.backgroundColor = theme.colors.gold;
+                      e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
-                    Add to Cart
-                  </Button>
-                </Box>
-              </Card>
-            </Grid>
-          ))
-        )}
-      </Grid>
-    </Box>
+                    🛒 Add to Cart
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

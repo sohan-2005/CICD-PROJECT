@@ -1,59 +1,266 @@
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const PublicNavbar = () => {
   const { pathname } = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState(null);
+  const navRef = useRef(null);
+
+  const theme = {
+    colors: {
+      primary: '#15803d',
+      primaryHover: '#166534',
+      background: '#fefce8',
+      surface: '#ffffff',
+      textPrimary: '#1f2937',
+      textSecondary: '#6b7280',
+      border: 'rgba(21, 128, 61, 0.15)',
+    },
+    typography: {
+      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      brand: { fontSize: '1.5rem', fontWeight: 800 },
+      nav: { fontSize: '1rem', fontWeight: 500 },
+    },
+    spacing: {
+      sm: '1rem', md: '1.5rem', lg: '2rem'
+    },
+    radius: { sm: '8px' },
+    shadows: {
+      sm: '0 2px 10px rgba(0,0,0,0.08)',
+      md: '0 10px 30px rgba(0,0,0,0.12)'
+    }
+  };
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const navItems = [
+    { to: "/", label: "Home" },
+    { to: "/about", label: "About Us" },
+    { to: "/contact", label: "Contact" },
+    { to: "/shop", label: "Shop" }
+  ];
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-      <div className="container">
-
-        <Link className="navbar-brand fw-bold text-success" to="/">
+    <nav 
+      ref={navRef}
+      style={{
+        backgroundColor: theme.colors.surface,
+        boxShadow: theme.shadows.sm,
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        borderBottom: `1px solid ${theme.colors.border}`
+      }}
+    >
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: `0.75rem ${theme.spacing.md}`,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        {/* BRAND */}
+        <Link 
+          to="/" 
+          style={{
+            ...theme.typography.brand,
+            color: theme.colors.primary,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '1.75rem',
+            letterSpacing: '-0.025em'
+          }}
+        >
           FarmerMart
         </Link>
 
+        {/* MOBILE TOGGLER */}
         <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#publicNav"
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            display: 'none',
+            background: 'none',
+            border: 'none',
+            padding: '0.5rem',
+            cursor: 'pointer',
+            '@media (max-width: 991px)': {
+              display: 'block'
+            }
+          }}
         >
-          <span className="navbar-toggler-icon"></span>
+          <svg 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke={theme.colors.textPrimary} 
+            strokeWidth="2"
+            style={{ display: 'block' }}
+          >
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+          {isOpen && (
+            <svg 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke={theme.colors.primary} 
+              strokeWidth="2"
+              style={{ display: 'block', position: 'absolute' }}
+            >
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          )}
         </button>
 
-        <div className="collapse navbar-collapse" id="publicNav">
-          <ul className="navbar-nav me-auto">
-
-            <li className="nav-item">
-              <Link className={`nav-link ${pathname === "/" ? "active" : ""}`} to="/">
-                Home
+        {/* NAV ITEMS */}
+        <ul style={{
+          display: 'flex',
+          listStyle: 'none',
+          margin: 0,
+          padding: 0,
+          gap: theme.spacing.md,
+          alignItems: 'center'
+        }}>
+          {navItems.map((item) => (
+            <li key={item.to} style={{ margin: 0 }}>
+              <Link
+                to={item.to}
+                onMouseEnter={() => setHoveredLink(item.to)}
+                onMouseLeave={() => setHoveredLink(null)}
+                style={{
+                  ...theme.typography.nav,
+                  color: pathname === item.to ? theme.colors.primary : theme.colors.textPrimary,
+                  textDecoration: 'none',
+                  padding: '0.75rem 1rem',
+                  borderRadius: theme.radius.sm,
+                  transition: 'all 0.2s ease',
+                  position: 'relative',
+                  fontWeight: pathname === item.to ? 600 : 500,
+                  ...(hoveredLink === item.to && {
+                    backgroundColor: theme.colors.primaryLight,
+                    color: theme.colors.primaryHover
+                  }),
+                  ...(pathname === item.to && {
+                    backgroundColor: theme.colors.primaryLight,
+                    boxShadow: `0 0 0 2px ${theme.colors.primary}`
+                  })
+                }}
+              >
+                {item.label}
               </Link>
             </li>
+          ))}
+        </ul>
 
-            <li className="nav-item">
-              <Link className={`nav-link ${pathname === "/about" ? "active" : ""}`} to="/about">
-                About Us
-              </Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className={`nav-link ${pathname === "/contact" ? "active" : ""}`} to="/contact">
-                Contact
-              </Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className={`nav-link ${pathname === "/shop" ? "active" : ""}`} to="/shop">
-                Shop
-              </Link>
-            </li>
-          </ul>
-
-          <div className="d-flex gap-2">
-            <Link className="btn btn-success" to="/login">Login</Link>
-            <Link className="btn btn-outline-success" to="/register">Register</Link>
-          </div>
+        {/* AUTH BUTTONS */}
+        <div style={{
+          display: 'flex',
+          gap: theme.spacing.sm,
+          alignItems: 'center'
+        }}>
+          <Link
+            to="/login"
+            style={{
+              padding: '0.625rem 1.5rem',
+              backgroundColor: 'transparent',
+              color: theme.colors.primary,
+              textDecoration: 'none',
+              border: `2px solid ${theme.colors.primary}`,
+              borderRadius: theme.radius.sm,
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              transition: 'all 0.25s ease',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            style={{
+              padding: '0.625rem 1.5rem',
+              backgroundColor: theme.colors.primary,
+              color: theme.colors.surface,
+              textDecoration: 'none',
+              borderRadius: theme.radius.sm,
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              transition: 'all 0.25s ease',
+              boxShadow: theme.shadows.sm,
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Register
+          </Link>
         </div>
       </div>
+
+      {/* MOBILE MENU */}
+      {isOpen && (
+        <div style={{
+          backgroundColor: theme.colors.surface,
+          borderTop: `1px solid ${theme.colors.border}`,
+          padding: `${theme.spacing.md} 0`
+        }}>
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: `0 ${theme.spacing.md}`
+          }}>
+            <ul style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.25rem',
+              listStyle: 'none',
+              margin: 0,
+              padding: 0
+            }}>
+              {navItems.map((item) => (
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
+                    onClick={() => setIsOpen(false)}
+                    style={{
+                      ...theme.typography.nav,
+                      color: pathname === item.to ? theme.colors.primary : theme.colors.textPrimary,
+                      textDecoration: 'none',
+                      padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
+                      display: 'block',
+                      borderRadius: theme.radius.sm,
+                      transition: 'all 0.2s ease',
+                      fontWeight: pathname === item.to ? 600 : 500
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

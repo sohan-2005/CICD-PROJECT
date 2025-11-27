@@ -32,6 +32,7 @@ import ProductList from './farmer/ProductList';
 import AdminDashboard from './admin/Dashboard';
 
 import RoleBasedNavbar from "./components/RoleBasedNavbar";
+import { CartProvider } from "./context/CartContext";
 
 
 
@@ -40,6 +41,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <CartProvider>
       <Router>
         <div className="d-flex flex-column min-vh-100 bg-light">
           <RoleBasedNavbar setCartOpen={setCartOpen} />
@@ -73,6 +75,7 @@ function App() {
           <Footer />
         </div>
       </Router>
+      </CartProvider>
     </AuthProvider>
   );
 }
